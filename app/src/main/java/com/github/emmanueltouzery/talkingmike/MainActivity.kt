@@ -45,8 +45,10 @@ class MainActivity : AppCompatActivity() {
         startButton.setOnClickListener {
             if (!isRecording) {
                 startRecordAndPlay()
+                startButton.text = "Ustavi snemanje"
             } else {
                 stopRecordAndPlay()
+                startButton.text = "Snemaj"
             }
         }
     }
