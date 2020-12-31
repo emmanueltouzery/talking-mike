@@ -9,6 +9,8 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.SeekBar
+import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.appcompat.app.AppCompatActivity
 
 
@@ -19,10 +21,10 @@ class MainActivity : AppCompatActivity() {
     var am: AudioManager? = null
     var record: AudioRecord? = null
     var track: AudioTrack? = null
+    var gain: Int = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            Log.e("ME", "requesting perms")
             requestPermissions(arrayOf(RECORD_AUDIO, MODIFY_AUDIO_SETTINGS), 1)
         }
         super.onCreate(savedInstanceState)
@@ -34,6 +36,21 @@ class MainActivity : AppCompatActivity() {
 
         am = this.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         am!!.isSpeakerphoneOn = true
+
+        val seekBar = findViewById<SeekBar>(R.id.seekBar)
+        seekBar.setOnSeekBarChangeListener(object: OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                gain = progress
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+            }
+
+        }
+        )
 
         object : Thread() {
             override fun run() {
@@ -70,11 +87,19 @@ class MainActivity : AppCompatActivity() {
         val lin = ShortArray(1024)
         var num = 0
         am!!.mode = AudioManager.MODE_IN_COMMUNICATION
+
         while (true) {
             if (isRecording) {
                 num = record!!.read(lin, 0, 1024)
+                transformBytes(lin, num);
                 track!!.write(lin, 0, num)
             }
+        }
+    }
+
+    private fun transformBytes(lin: ShortArray, len: Int) {
+        for (i in 0 until len) {
+            lin[i] = kotlin.math.min(lin[i].toInt() * gain, Short.MAX_VALUE.toInt()).toShort()
         }
     }
 
