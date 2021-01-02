@@ -71,16 +71,28 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initRecordAndTrack() {
-        val min = AudioRecord.getMinBufferSize(8000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT)
-        record = AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION, 8000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT,
+        val min = AudioRecord.getMinBufferSize(22050, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT)
+        record = AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION, 22050, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT,
                 min)
         if (AcousticEchoCanceler.isAvailable()) {
             val echoCanceler = AcousticEchoCanceler.create(record!!.audioSessionId)
             echoCanceler.enabled = true
         }
-        val maxJitter = AudioTrack.getMinBufferSize(8000, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT)
-        track = AudioTrack(AudioManager.MODE_IN_COMMUNICATION, 8000, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, maxJitter,
-                AudioTrack.MODE_STREAM)
+        val maxJitter = AudioTrack.getMinBufferSize(22050, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT)
+        track = AudioTrack.Builder()
+                .setAudioAttributes(AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_ALARM)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .build())
+                .setAudioFormat(AudioFormat.Builder()
+                        .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+                        .setSampleRate(22050)
+                        .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
+                        .build())
+                .setBufferSizeInBytes(maxJitter)
+                .setPerformanceMode(AudioTrack.PERFORMANCE_MODE_LOW_LATENCY) //
+                .setTransferMode(AudioTrack.MODE_STREAM)
+                .build()
     }
 
     private fun recordAndPlay() {
@@ -99,7 +111,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun transformBytes(lin: ShortArray, len: Int) {
         for (i in 0 until len) {
-            lin[i] = kotlin.math.min(lin[i].toInt() * gain, Short.MAX_VALUE.toInt()).toShort()
+            lin[i] = kotlin.math.max(Short.MIN_VALUE.toInt(), kotlin.math.min(lin[i].toInt() * gain, Short.MAX_VALUE.toInt())).toShort()
         }
     }
 
