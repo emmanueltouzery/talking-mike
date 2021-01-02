@@ -52,6 +52,23 @@ class MainActivity : AppCompatActivity() {
         }
         )
 
+        val seekBarBufSize = findViewById<SeekBar>(R.id.seekBarBufSize)
+        seekBarBufSize.setOnSeekBarChangeListener(object: OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                track!!.bufferSizeInFrames = track!!.bufferCapacityInFrames * progress / seekBar!!.max
+                Log.i("TAG", "buf cap in frames: " + track!!.bufferCapacityInFrames)
+                Log.i("TAG", "set buf size in frames: " + track!!.bufferSizeInFrames)
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+            }
+
+        }
+        )
+
         object : Thread() {
             override fun run() {
                 recordAndPlay()

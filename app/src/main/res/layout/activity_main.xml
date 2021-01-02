@@ -24,8 +24,38 @@
         android:max="15"
         android:progress="3"
         app:layout_constraintBottom_toBottomOf="@id/button"
-        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/glasnostLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Glasnost"
+        app:layout_constraintEnd_toStartOf="@id/seekBar"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/seekBar" />
+
+    <SeekBar
+        android:id="@+id/seekBarBufSize"
+        style="@style/Widget.AppCompat.SeekBar.Discrete"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:max="20"
+        android:progress="3"
+        app:layout_constraintBottom_toBottomOf="@id/seekBar"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/zakasnitevLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Zakasnitev"
+        app:layout_constraintEnd_toStartOf="@id/seekBarBufSize"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/seekBarBufSize" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
